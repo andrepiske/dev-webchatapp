@@ -12,6 +12,8 @@ require 'pry-byebug'
 
 $redis = Redis.new(url: "redis://localhost/14")
 
+set :public_folder, 'public'
+
 post '/send_message' do
   payload = MultiJson.load(request.body.read)
 
@@ -45,5 +47,5 @@ get '/poll_messages/:cursor' do
 end
 
 get '/' do
-  erb :index
+  File.read("public/index.html")
 end
