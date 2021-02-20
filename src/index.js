@@ -1,8 +1,8 @@
 
 import Vue from 'vue';
-import App from './views/App.vue'
+import AppContainer from './views/AppContainer.vue'
 
 new Vue({
-  ...App,
+  ...AppContainer,
   el: '#app_container'
 });

@@ -6,14 +6,14 @@
     <div class="application_container">
 
       <div class="user_name__container">
-        User name:
-        <input type="text" v-model="userName">
+        User name: {{ user.full_name }}
       </div>
 
       <div class="chat_text__container">
         <div class="chat_text__message__wrapper" v-for="message in messages">
           <div class="chat_text__message__user_name">{{ message.userName }}</div>
           <div class="chat_text__message__text">{{ message.messageContent }}</div>
+          <div class="chat_text__message__timestamp">{{ formatMessageTime(message) }}</div>
         </div>
       </div>
 
@@ -27,17 +27,27 @@
 </template>
 
 <script>
+import dateFormat from 'dateformat';
+
 export default {
   data() {
     return {
       latestCursor: 0,
-      userName: 'Jane',
       messageContent: '',
       messages: [],
     }
   },
 
+  props: [
+    'user'
+  ],
+
   methods: {
+    formatMessageTime(message) {
+      const d = new Date(message.timestamp);
+      return dateFormat(d, 'dd/mm HH:MM');
+    },
+
     checkNewMessages() {
       fetch(`/poll_messages/${this.latestCursor}`, {
         method: 'GET',
@@ -66,7 +76,8 @@ export default {
     insertMessageInScreen(msg) {
       this.messages.push({
         userName: msg.user_name,
-        messageContent: msg.message_content
+        messageContent: msg.message_content,
+        timestamp: msg.current_time
       });
     },
 
@@ -74,10 +85,10 @@ export default {
       fetch("/send_message", {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Api-Token': this.user.token,
         },
         body: JSON.stringify({
-          user_name: this.userName,
           message_content: this.messageContent
         })
       }).then((response) => {
@@ -97,7 +108,7 @@ export default {
     this.checkNewMessages();
 
     setInterval(() => {
-      console.log("Checking for new messages...");
+      // console.log("Checking for new messages...");
       this.checkNewMessages();
     }, 1000);
   }

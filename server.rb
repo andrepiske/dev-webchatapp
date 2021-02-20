@@ -12,12 +12,38 @@ require 'pry-byebug'
 
 $redis = Redis.new(url: "redis://localhost/14")
 
+$user_db = [
+  {
+    username: "john",
+    password: "sekret",
+    token: "t9t938r39rt948yt4",
+    full_name: "John Doe"
+  },
+  {
+    username: "alice",
+    password: "sekret",
+    token: "9yr9hwe9uwnw9ufhwf",
+    full_name: "Alice von Wonderland"
+  }
+]
+
 set :public_folder, 'public'
 
 post '/send_message' do
   payload = MultiJson.load(request.body.read)
 
-  user_name = payload["user_name"]
+  api_token = request.env['HTTP_API_TOKEN']
+  if !api_token
+    # error message....
+  end
+
+  user = $user_db.find { |u| u[:token] == api_token }
+  if !user
+    # error message....
+    return
+  end
+
+  user_name = user[:username]
   message_content = payload["message_content"]
   current_time = Time.now
 
@@ -48,4 +74,26 @@ end
 
 get '/' do
   File.read("public/index.html")
+end
+
+### Authentication stuff
+
+post '/perform_login' do
+  payload = MultiJson.load(request.body.read)
+
+  $user_db.each do |user|
+    if user[:username] == payload["username"] && user[:password] == payload["password"]
+
+      return MultiJson.dump({
+        status: "login_success",
+        token: user[:token],
+        full_name: user[:full_name]
+      })
+    end
+  end
+
+  MultiJson.dump({
+    status: "login_failed",
+    message: "User name or password are wrong"
+  })
 end
