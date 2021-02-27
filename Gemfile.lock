@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    bcrypt (3.1.16)
     byebug (11.1.3)
     coderay (1.1.3)
     method_source (1.0.0)
@@ -30,6 +31,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bcrypt
   multi_json
   oj
   pry

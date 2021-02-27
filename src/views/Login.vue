@@ -23,8 +23,8 @@ import { EventBus } from '../EventBus.js';
 export default {
   data() {
     return {
-      username: 'alice',
-      password: 'sekret',
+      username: '',
+      password: '',
     }
   },
 

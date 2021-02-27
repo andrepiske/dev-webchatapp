@@ -1,0 +1,12 @@
+[
+  {
+    "username": "john",
+    "password": "$2a$12$6CXgzoDpQD4Kj.aQ1qJjAOjkNWKZ6rcF4UP4aNl1zmMK4IAO2sJ1i",
+    "full_name": "John Doe"
+  },
+  {
+    "username": "alice",
+    "password": "$2a$12$1lAybq3sAqwjpDQvCOxrGejQ6g2CCcEXHBUyJDHU9CRPqUDE9FRFC",
+    "full_name": "Alice von Wonderland"
+  }
+]
