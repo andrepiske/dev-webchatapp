@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="application_container">
 
     <App :user="userDetails" v-if="userIsLoggedIn"></App>
     <Login v-else></Login>

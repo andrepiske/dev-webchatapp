@@ -1,28 +1,36 @@
 <template lang="html">
-  <div>
-
-    <h1>Chat application</h1>
-
-    <div class="application_container">
-
-      <div class="user_name__container">
-        User name: {{ user.full_name }}
+  <div class="chat_container">
+    <div class="chat_header">
+      <div class="chat_header__title">
+        <h1>Ruby chat</h1>
       </div>
 
-      <div class="chat_text__container">
-        <div class="chat_text__message__wrapper" v-for="message in messages">
-          <div class="chat_text__message__user_name">{{ message.userName }}</div>
-          <div class="chat_text__message__text">{{ message.messageContent }}</div>
-          <div class="chat_text__message__timestamp">{{ formatMessageTime(message) }}</div>
-        </div>
+      <div class="chat_header__user_name">
+        {{ user.full_name }}
       </div>
 
-      <div class="message_input_container">
-        <input type="text" v-model="messageContent">
-        <button @click="onSendClick">Send</button>
+      <div class="chat_header__user_avatar">
+        <img src="/img/empty-avatar.png" alt="No avatar">
       </div>
     </div>
 
+    <div class="chat_text__container">
+      <div class="chat_text__message__wrapper" v-for="message in messages">
+        <div class="chat_text__message__user_name">{{ message.userName }}</div>
+        <div class="chat_text__message__text">{{ message.messageContent }}</div>
+        <div class="chat_text__message__timestamp">{{ formatMessageTime(message) }}</div>
+      </div>
+    </div>
+
+    <div class="chat_container__footer">
+      <div class="message_input_container">
+        <input class="message_input_container__message" type="text" v-model="messageContent">
+
+        <button class="message_input__send_button" @click="onSendClick">
+          <img src="/img/send-icon.png" alt="Send">
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
