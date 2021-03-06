@@ -8,6 +8,7 @@ GEM
     multi_json (1.15.0)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
+    nio4r (2.5.7)
     oj (3.11.2)
     pry (0.13.1)
       coderay (~> 1.1)
@@ -15,6 +16,8 @@ GEM
     pry-byebug (3.9.0)
       byebug (~> 11.0)
       pry (~> 0.13.0)
+    puma (5.2.2)
+      nio4r (~> 2.0)
     rack (2.2.3)
     rack-protection (2.1.0)
       rack
@@ -25,7 +28,14 @@ GEM
       rack (~> 2.2)
       rack-protection (= 2.1.0)
       tilt (~> 2.0)
+    sinatra-contrib (2.1.0)
+      multi_json
+      mustermann (~> 1.0)
+      rack-protection (= 2.1.0)
+      sinatra (= 2.1.0)
+      tilt (~> 2.0)
     tilt (2.0.10)
+    zeitwerk (2.4.2)
 
 PLATFORMS
   ruby
@@ -36,8 +46,11 @@ DEPENDENCIES
   oj
   pry
   pry-byebug
+  puma
   redis
   sinatra
+  sinatra-contrib
+  zeitwerk
 
 BUNDLED WITH
    2.1.4

@@ -57,7 +57,7 @@ export default {
     },
 
     checkNewMessages() {
-      fetch(`/poll_messages/${this.latestCursor}`, {
+      fetch(`/m/poll/${this.latestCursor}`, {
         method: 'GET',
         cache: 'no-cache',
         headers: {
@@ -90,7 +90,7 @@ export default {
     },
 
     onSendClick() {
-      fetch("/send_message", {
+      fetch("/m/send", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
