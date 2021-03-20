@@ -40,7 +40,7 @@ import dateFormat from 'dateformat';
 export default {
   data() {
     return {
-      latestCursor: 0,
+      channelId: 'start',
       messageContent: '',
       messages: [],
     }
@@ -56,16 +56,45 @@ export default {
       return dateFormat(d, 'dd/mm HH:MM');
     },
 
+    pollForNewMessages() {
+      this.checkNewMessages().then(() => {
+        this.pollForNewMessages();
+      });
+    },
+
     checkNewMessages() {
-      fetch(`/m/poll/${this.latestCursor}`, {
-        method: 'GET',
-        cache: 'no-cache',
-        headers: {
-          'Accept': 'application/json'
-        },
-      }).then((response) => {
-        response.json().then((content) => {
-          this.processMessagesResponse(content);
+      return new Promise((resolve, reject) => {
+        fetch(`/m/poll/${this.channelId}`, {
+          method: 'GET',
+          cache: 'no-cache',
+          headers: {
+            'Accept': 'application/json'
+          },
+        }).then((response) => {
+          response.json().then((content) => {
+            this.channelId = content.channel_id;
+            if (content.message) {
+              this.processMessagesResponse([ content.message ]);
+            }
+            resolve();
+          });
+        }).catch(resolve);
+      });
+    },
+
+    fetchArchivedMessages() {
+      return new Promise((resolve, reject) => {
+        fetch('/m/archived', {
+          method: 'GET',
+          cache: 'no-cache',
+          headers: {
+            'Accept': 'application/json'
+          },
+        }).then((response) => {
+          response.json().then((content) => {
+            this.processMessagesResponse(content);
+            resolve();
+          });
         });
       });
     },
@@ -73,11 +102,10 @@ export default {
     processMessagesResponse(messages) {
       for (let msg of messages) {
         this.insertMessageInScreen(msg);
-
-        let messageTime = new Date(msg.current_time).getTime() / 1000;
-        if (messageTime > this.latestCursor) {
-          this.latestCursor = messageTime;
-        }
+        // let messageTime = new Date(msg.current_time).getTime() / 1000;
+        // if (messageTime > this.latestCursor) {
+        //   this.latestCursor = messageTime;
+        // }
       }
     },
 
@@ -113,12 +141,7 @@ export default {
   },
 
   mounted() {
-    this.checkNewMessages();
-
-    setInterval(() => {
-      // console.log("Checking for new messages...");
-      this.checkNewMessages();
-    }, 1000);
+    this.fetchArchivedMessages().then(this.pollForNewMessages);
   }
 }
 </script>

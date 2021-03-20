@@ -15,6 +15,7 @@ gem 'multi_json'
 
 gem 'zeitwerk'
 
+gem 'connection_pool'
 gem 'puma'
 
 group :development do

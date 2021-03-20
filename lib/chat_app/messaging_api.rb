@@ -24,42 +24,56 @@ module ChatApp::MessagingApi
         message_content = payload["message_content"]
         current_time = Time.now
 
-        $redis.rpush("messages", MultiJson.dump({
-          user_name: user_name,
-          message_content: message_content,
-          current_time: current_time
-        }))
+        AppEnvironment.instance.redis_pool.with do |redis|
+          serialized_message = MultiJson.dump({
+            user_name: user_name,
+            message_content: message_content,
+            current_time: current_time
+          })
+
+          redis.rpush("messages", serialized_message)
+          redis.keys("channel:reg:*").each do |key_name|
+            channel_id = key_name.split(":").last
+
+            redis.rpush("channel:#{channel_id}:messages", serialized_message)
+          end
+        end
 
         status 204
       end
 
-      get '/poll/:cursor' do
-        cursor = Time.at(params[:cursor].to_i)
-
-        iterations = 0
-        messages = nil
-
-        loop do
-          messages = $redis.lrange("messages", 0, -1).map do |msg_string|
+      get '/archived' do
+        messages = AppEnvironment.instance.redis_pool.with do |redis|
+          redis.lrange("messages", 0, -1).map do |msg_string|
             MultiJson.load(msg_string)
           end
-
-          messages = messages.select do |msg|
-            msg_timestamp = Time.parse(msg["current_time"])
-
-            msg_timestamp > cursor
-          end
-
-          break unless messages.empty?
-
-          iterations += 1
-          break if iterations > 30
-
-          puts "polling messages..."
-          sleep(1)
         end
 
         MultiJson.dump(messages)
+      end
+
+      get '/poll/:channel_id' do
+        channel_id = params[:channel_id]
+
+        if channel_id == "start"
+          channel_id = SecureRandom.uuid
+        end
+
+        _, msg_string = AppEnvironment.instance.redis_pool.with do |redis|
+          redis.set("channel:reg:#{channel_id}", "1")
+          redis.brpop("channel:#{channel_id}:messages", timeout: 5)
+        end
+
+        if !msg_string
+          return MultiJson.dump({
+            channel_id: channel_id
+          })
+        end
+
+        MultiJson.dump({
+          channel_id: channel_id,
+          message: MultiJson.load(msg_string)
+        })
       end
     end
   end

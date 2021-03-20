@@ -26,6 +26,7 @@ require 'sinatra'
 require 'sinatra/namespace'
 
 require 'redis'
+require 'connection_pool'
 require 'oj'
 require 'multi_json'
 require 'bcrypt'
@@ -39,6 +40,7 @@ end
 
 class AppEnvironment
   attr_reader :env
+  attr_reader :redis_pool
 
   def self.instance
     @instance ||= new
@@ -60,7 +62,9 @@ class AppEnvironment
   end
 
   def setup_db_connections
-    $redis = Redis.new(url: @redis_url)
+    @redis_pool = ConnectionPool.new(size: 20, timeout: 5) do
+      Redis.new(url: @redis_url)
+    end
 
     def symbolize_keys(hash)
       Hash[
